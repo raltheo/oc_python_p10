@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "api_rest"
 ]
+AUTH_USER_MODEL = 'api_rest.MyUser'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
