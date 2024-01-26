@@ -12,6 +12,8 @@ def getData(request):
     person = {"ds": "ds"}
     return Response(person)
 
+# https://openclassrooms.com/fr/courses/7192416-mettez-en-place-une-api-avec-django-rest-framework/7424720-donnez-des-acces-avec-les-tokens
+
 class UserLoginView(APIView):
     permission_classes = [AllowAny]
 
