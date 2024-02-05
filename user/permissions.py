@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from .models import Contributor, Issue
+from api_rest.models import Contributor, Issue
 
 class IsContributorPermission(BasePermission):
 
@@ -32,7 +32,7 @@ class IsContributorPermission(BasePermission):
             return False
 
         try:
-            contributor = Contributor.objects.get(user=user, projects__id=project_id)
+            Contributor.objects.get(user=user, projects__id=project_id)
             return True
         except Contributor.DoesNotExist:
             return False

@@ -38,9 +38,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "api_rest"
+    "api_rest",
+    "user"
 ]
-AUTH_USER_MODEL = 'api_rest.MyUser'
+AUTH_USER_MODEL = 'user.MyUser'
 
 JWT_AUTH = {
     'JWT_SECRET_KEY': 'your_secret_key',

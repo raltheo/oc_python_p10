@@ -2,37 +2,14 @@ from functools import partial
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import Issue, MyUser, Project, Comment, Contributor
+from rest_framework.permissions import IsAuthenticated
+from .models import Issue, Project, Comment, Contributor
 from .serializers import ProjectSerializer, IssueSerializer, ProjectDetailSerializer, IssueDetailSerializer, CommentSerializer
 from django.shortcuts import get_object_or_404
-from .permissions import IsContributorPermission
+from user.permissions import IsContributorPermission
 # Create your views here.
 
 # https://openclassrooms.com/fr/courses/7192416-mettez-en-place-une-api-avec-django-rest-framework/7424720-donnez-des-acces-avec-les-tokens
-
-class UserRegistrationView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        data = request.data
-
-        required_fields = ['username', 'password', 'age', 'can_be_contacted', 'can_data_be_shared']
-        if not all(field in data for field in required_fields):
-            return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user = MyUser.objects.create_user(
-                username=data['username'],
-                password=data['password'],
-                age=data['age'],
-                can_be_contacted=data['can_be_contacted'],
-                can_data_be_shared=data['can_data_be_shared']
-            )
-            Contributor.objects.create(user=user)
-            return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
  
 class ProjectView(APIView):
@@ -196,9 +173,8 @@ class CommentUpdateView(APIView):
 
     def put(self, request, comment_id):
         comment = get_object_or_404(Comment, pk=comment_id)
-
         if comment.author == request.user:
-            serializer = IssueSerializer(comment, data=request.data, partial=True)
+            serializer = CommentSerializer(comment, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response({'message': 'Comment updated successfully'}, status=status.HTTP_200_OK)
