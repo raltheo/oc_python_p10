@@ -1,4 +1,3 @@
-from functools import partial
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -7,6 +6,7 @@ from .models import Issue, Project, Comment, Contributor
 from .serializers import ProjectSerializer, IssueSerializer, ProjectDetailSerializer, IssueDetailSerializer, CommentSerializer
 from django.shortcuts import get_object_or_404
 from user.permissions import IsContributorPermission
+from rest_framework.pagination import PageNumberPagination
 # Create your views here.
 
 # https://openclassrooms.com/fr/courses/7192416-mettez-en-place-une-api-avec-django-rest-framework/7424720-donnez-des-acces-avec-les-tokens
@@ -37,9 +37,13 @@ class ProjectView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def get(self, request):
+        paginator = PageNumberPagination()
+        paginator.page_size = 10 
+
         projects = Project.objects.all()
-        serializer = ProjectSerializer(projects, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        result_page = paginator.paginate_queryset(projects, request)
+        serializer = ProjectSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
 
 class ProjectDetailView(APIView):
@@ -51,10 +55,6 @@ class ProjectDetailView(APIView):
         serializer = ProjectDetailSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-class ProjectDeleteView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def delete(self, request, project_id):
         project = get_object_or_404(Project, pk=project_id)
 
@@ -63,6 +63,7 @@ class ProjectDeleteView(APIView):
             return Response({'message': 'Project deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({'error': 'You are not the author of this project'}, status=status.HTTP_403_FORBIDDEN)
+    
 
 class IssueView(APIView):
     permission_classes = [IsAuthenticated, IsContributorPermission]
@@ -91,8 +92,8 @@ class IssueView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-class IssueDeleteView(APIView):
-    permission_classes = [IsAuthenticated]
+class IssueDetailView(APIView):
+    permission_classes = [IsAuthenticated, IsContributorPermission]
 
     def delete(self, request, issue_id):
         issue = get_object_or_404(Issue, pk=issue_id)
@@ -103,18 +104,10 @@ class IssueDeleteView(APIView):
         else:
             return Response({'error': 'You are not the author of this issue'}, status=status.HTTP_403_FORBIDDEN)
     
-
-class IssueDetailView(APIView):
-
-    permission_classes = [IsAuthenticated, IsContributorPermission]
-
     def get(self, request, issue_id):
         issue = get_object_or_404(Issue, pk=issue_id)
         serializer = IssueDetailSerializer(issue)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-class IssuetUpdateView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def put(self, request, issue_id):
         issue = get_object_or_404(Issue, pk=issue_id)
@@ -128,6 +121,7 @@ class IssuetUpdateView(APIView):
                 return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'error': 'You are not the author of this issue'}, status=status.HTTP_403_FORBIDDEN)
+
 
 
 class CommentView(APIView):
@@ -155,7 +149,7 @@ class CommentView(APIView):
         
     
 
-class CommentDeleteView(APIView):
+class CommentDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, comment_id):
@@ -167,10 +161,6 @@ class CommentDeleteView(APIView):
         else:
             return Response({'error': 'You are not the author of this comment'}, status=status.HTTP_403_FORBIDDEN)
         
-
-class CommentUpdateView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def put(self, request, comment_id):
         comment = get_object_or_404(Comment, pk=comment_id)
         if comment.author == request.user:
@@ -182,3 +172,4 @@ class CommentUpdateView(APIView):
                 return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'error': 'You are not the author of this comment'}, status=status.HTTP_403_FORBIDDEN)
+

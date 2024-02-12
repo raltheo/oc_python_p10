@@ -168,7 +168,7 @@ def add_contributor(token, project_id):
     header = {
         "Authorization" : f"Bearer {token}"
     }
-    response = requests.get(f'{URL}/api/contributor/del_add/{project_id}', headers=header)
+    response = requests.get(f'{URL}/api/contributor/manage/{project_id}', headers=header)
     if response.status_code == 201:
         color("[+] Add contributor work !", "green")
     else:
@@ -210,3 +210,5 @@ if __name__ == "__main__":
     get_one_project(user2, project_user1, True)
     get_one_issue(user2, issue_user1, True)
 
+# add update comment et issue
+# delete project, issue et comment et user

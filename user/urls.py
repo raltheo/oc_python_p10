@@ -8,5 +8,7 @@ urlpatterns = [
     path("token", TokenObtainPairView.as_view()),
     path("refresh", TokenRefreshView.as_view()),
 
-    path("contributor/del_add/<int:project_id>", views.ContributorView.as_view())
+    path("contributor/manage/<int:project_id>", views.ContributorView.as_view()),
+    path("user/delete", views.UserDeleteView.as_view())
+
 ]

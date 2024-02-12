@@ -32,6 +32,19 @@ class UserRegistrationView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
+class UserDeleteView(APIView):
+    permission_classes = [IsAuthenticated] 
+    
+    def delete(self, request):
+        user = get_object_or_404(MyUser, id=request.user.id)
+        try:
+            user.delete()
+            return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 class ContributorView(APIView):
     permission_classes = [IsAuthenticated]
 
