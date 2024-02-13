@@ -8,6 +8,10 @@ class IsContributorPermission(BasePermission):
             return self.has_permission_post(request, view)
         elif request.method == 'GET':
             return self.has_permission_get(request, view)
+        elif request.method == 'PUT':
+            return self.has_permission_get(request, view)
+        elif request.method == 'DELETE':
+            return self.has_permission_get(request, view)
         else:
             return False
 
@@ -27,6 +31,8 @@ class IsContributorPermission(BasePermission):
             project_id = issue.project_id
         return self.check_contributor(request.user, project_id)
 
+    
+    
     def check_contributor(self, user, project_id):
         if not project_id:
             return False

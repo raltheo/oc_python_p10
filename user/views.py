@@ -63,11 +63,10 @@ class ContributorView(APIView):
         try:
             contributor = get_object_or_404(Contributor, user=request.user)
             project = get_object_or_404(Project, id=project_id)
-
-            if project.creator == request.user or project in contributor.projects.all():
+            if project in contributor.projects.all():
                 contributor.projects.remove(project)
-                return Response({'message': 'Remove successfully'}, status=status.HTTP_200_OK)
+                return Response({'message': 'You are no longer a contributor of this project.'}, status=status.HTTP_200_OK)
             else:
-                return Response({'error': 'You do this.'}, status=status.HTTP_403_FORBIDDEN)
+                return Response({'message': 'You are not a contributor of this project.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

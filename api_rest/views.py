@@ -111,7 +111,6 @@ class IssueDetailView(APIView):
 
     def put(self, request, issue_id):
         issue = get_object_or_404(Issue, pk=issue_id)
-
         if issue.author == request.user:
             serializer = IssueSerializer(issue, data=request.data, partial=True)
             if serializer.is_valid():
