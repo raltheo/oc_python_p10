@@ -20,6 +20,7 @@ class Issue(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='assigned_issues')
+    assigned_contributor = models.ForeignKey(Contributor, on_delete=models.CASCADE, related_name='assigned_contributor', null=True, blank=True)
     priority = models.CharField(max_length=10, choices=[('LOW', 'Low'), ('MEDIUM', 'Medium'), ('HIGH', 'High')])
     tag = models.CharField(max_length=10, choices=[('BUG', 'Bug'), ('FEATURE', 'Feature'), ('TASK', 'Task')])
     status = models.CharField(max_length=20, choices=[('To Do', 'To Do'), ('In Progress', 'In Progress'), ('Finished', 'Finished')], default='To Do')

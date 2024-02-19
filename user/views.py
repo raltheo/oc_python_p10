@@ -18,7 +18,10 @@ class UserRegistrationView(APIView):
         if not all(field in data for field in required_fields):
             return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
 
+        
         try:
+            if int(data["age"]) < 15:
+                return Response({'error': 'Your too young !'}, status=status.HTTP_401_UNAUTHORIZED)
             user = MyUser.objects.create_user(
                 username=data['username'],
                 password=data['password'],

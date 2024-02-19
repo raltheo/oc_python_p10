@@ -31,7 +31,7 @@ class ProjectView(APIView):
                 author=request.user
             )
             contributor = Contributor.objects.get(user=request.user)
-            contributor.projects.set([project])
+            contributor.projects.add(project)
             return Response({'message': 'Project created successfully'}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -43,7 +43,8 @@ class ProjectView(APIView):
         projects = Project.objects.all()
         result_page = paginator.paginate_queryset(projects, request)
         serializer = ProjectSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        # return paginator.get_paginated_response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 class ProjectDetailView(APIView):
@@ -70,14 +71,19 @@ class IssueView(APIView):
     
     def post(self, request):
         data = request.data
-
+        assigned_contributor = None
         required_fields = ['name', 'description', 'priority', 'tag', 'status', 'project_id']
         if not all(field in data for field in required_fields):
 
             return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
         project = get_object_or_404(Project, pk=data["project_id"])
-        
         try:
+            if 'assigned_contributor' in data: 
+                assigned_contributor = get_object_or_404(Contributor, pk=data["assigned_contributor"])
+
+                if project not in assigned_contributor.projects.all():
+                    return Response({'error': 'The contributor you are trying to assign to this issue is not a contributor of the project.'}, status=status.HTTP_401_UNAUTHORIZED)
+
             issue = Issue.objects.create(
                 name=data['name'],
                 description=data['description'],
@@ -85,6 +91,7 @@ class IssueView(APIView):
                 tag=data['tag'],
                 status=data['status'],
                 author=request.user,
+                assigned_contributor=assigned_contributor,
                 project=project
             )
             
@@ -105,6 +112,7 @@ class IssueDetailView(APIView):
             return Response({'error': 'You are not the author of this issue'}, status=status.HTTP_403_FORBIDDEN)
     
     def get(self, request, issue_id):
+        print("ok")
         issue = get_object_or_404(Issue, pk=issue_id)
         serializer = IssueDetailSerializer(issue)
         return Response(serializer.data, status=status.HTTP_200_OK)

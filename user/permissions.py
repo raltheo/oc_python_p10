@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 from api_rest.models import Contributor, Issue
+from django.shortcuts import get_object_or_404
 
 class IsContributorPermission(BasePermission):
 
@@ -19,7 +20,7 @@ class IsContributorPermission(BasePermission):
         if request.data.get('project_id') and not request.data.get('issue_id'):
             project_id = request.data.get('project_id')
         else:
-            issue = Issue.objects.get(id=request.data.get('issue_id'))
+            issue = get_object_or_404(Issue, id=request.data.get('issue_id'))
             project_id = issue.project_id
         return self.check_contributor(request.user, project_id)
 
@@ -27,7 +28,7 @@ class IsContributorPermission(BasePermission):
         if view.kwargs.get('project_id') and not view.kwargs.get('issue_id'):
             project_id = view.kwargs.get('project_id')
         else:
-            issue = Issue.objects.get(id=view.kwargs.get('issue_id'))
+            issue = get_object_or_404(Issue, id=view.kwargs.get('issue_id'))
             project_id = issue.project_id
         return self.check_contributor(request.user, project_id)
 
@@ -38,7 +39,7 @@ class IsContributorPermission(BasePermission):
             return False
 
         try:
-            Contributor.objects.get(user=user, projects__id=project_id)
+            get_object_or_404(Contributor, user=user, projects__id=project_id)
             return True
         except Contributor.DoesNotExist:
             return False
