@@ -34,7 +34,7 @@ class ProjectView(APIView):
             contributor.projects.add(project)
             return Response({'message': 'Project created successfully'}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=status.HTTP_417_EXPECTATION_FAILED)
         
     def get(self, request):
         paginator = PageNumberPagination()
@@ -97,7 +97,7 @@ class IssueView(APIView):
             
             return Response({'message': 'Issue created successfully'}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=status.HTTP_417_EXPECTATION_FAILED)
         
 class IssueDetailView(APIView):
     permission_classes = [IsAuthenticated, IsContributorPermission]
@@ -152,7 +152,7 @@ class CommentView(APIView):
             
             return Response({'message': 'Comment created successfully'}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=status.HTTP_417_EXPECTATION_FAILED)
         
     
 

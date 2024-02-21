@@ -32,7 +32,7 @@ class UserRegistrationView(APIView):
             Contributor.objects.create(user=user)
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=status.HTTP_417_EXPECTATION_FAILED)
         
 
 class UserDeleteView(APIView):
@@ -44,7 +44,7 @@ class UserDeleteView(APIView):
             user.delete()
             return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=status.HTTP_417_EXPECTATION_FAILED)
 
 
 
@@ -60,7 +60,7 @@ class ContributorView(APIView):
                 contributor.projects.add(project)
             return Response({'message': 'You are now contributor of this project !'}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=status.HTTP_417_EXPECTATION_FAILED)
         
     def delete(self, request, project_id):
         try:
@@ -72,4 +72,4 @@ class ContributorView(APIView):
             else:
                 return Response({'message': 'You are not a contributor of this project.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=status.HTTP_417_EXPECTATION_FAILED)
