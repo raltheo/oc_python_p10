@@ -112,7 +112,6 @@ class IssueDetailView(APIView):
             return Response({'error': 'You are not the author of this issue'}, status=status.HTTP_403_FORBIDDEN)
     
     def get(self, request, issue_id):
-        print("ok")
         issue = get_object_or_404(Issue, pk=issue_id)
         serializer = IssueDetailSerializer(issue)
         return Response(serializer.data, status=status.HTTP_200_OK)
