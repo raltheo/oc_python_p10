@@ -9,6 +9,6 @@ urlpatterns = [
     path("refresh", TokenRefreshView.as_view()),
 
     path("contributor/manage/<int:project_id>", views.ContributorView.as_view()),
-    path("user/delete", views.UserDeleteView.as_view())
+    path("user", views.UserView.as_view())
 
 ]

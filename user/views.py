@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import MyUser
+from .serializers import MyUserSerializer
 from api_rest.models import Contributor, Project
 
 # Create your views here.
@@ -35,7 +36,7 @@ class UserRegistrationView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_417_EXPECTATION_FAILED)
         
 
-class UserDeleteView(APIView):
+class UserView(APIView):
     permission_classes = [IsAuthenticated] 
     
     def delete(self, request):
@@ -46,6 +47,21 @@ class UserDeleteView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_417_EXPECTATION_FAILED)
 
+    def get(self, request):
+        user = get_object_or_404(MyUser, id=request.user.id)
+        serializer = MyUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def put(self, request):
+        user = get_object_or_404(MyUser, pk=request.user.id)
+        
+        serializer = MyUserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'User updated successfully'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ContributorView(APIView):
