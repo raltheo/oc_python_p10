@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission
 from api_rest.models import Contributor, Issue
 from django.shortcuts import get_object_or_404
-
+from django.core.exceptions import PermissionDenied
 
 class IsContributorPermission(BasePermission):
     def has_permission(self, request, view):
@@ -37,7 +37,7 @@ class IsContributorPermission(BasePermission):
             return False
 
         try:
-            get_object_or_404(Contributor, user=user, projects__id=project_id)
+            Contributor.objects.get(user=user, projects__id=project_id)
             return True
-        except Contributor.DoesNotExist:
-            return False
+        except:
+            raise PermissionDenied()
